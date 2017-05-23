@@ -7,8 +7,8 @@ from mock import patch
 from zerver.lib.actions import get_realm, try_add_realm_custom_profile_field, \
     do_update_user_custom_profile_data, do_remove_realm_custom_profile_field
 from zerver.lib.test_classes import ZulipTestCase
-from zerver.models import CustomProfileField, get_user_profile_by_email, \
-    custom_profile_fields_for_realm
+from zerver.models import CustomProfileField, \
+    custom_profile_fields_for_realm, get_user
 import ujson
 
 
@@ -222,7 +222,9 @@ class CustomProfileDataTest(ZulipTestCase):
                                    {'data': ujson.dumps(data)})
         self.assert_json_success(result)
 
-        iago = get_user_profile_by_email('iago@zulip.com')
+        email = 'iago@zulip.com'
+        realm = get_realm('zulip')
+        iago = get_user(email, realm)
         expected_value = {f['id']: f['value'] for f in data}
 
         for field_dict in iago.profile_data:
