@@ -194,7 +194,7 @@ def remote_user_jwt(request):
     return login_or_register_remote_user(request, email, user_profile, remote_user)
 
 def google_oauth2_csrf(request, value):
-    # type: (HttpRequest, str) -> HttpResponse
+    # type: (HttpRequest, str) -> str
     # In Django 1.10, get_token returns a salted token which changes
     # everytime get_token is called.
     from django.middleware.csrf import _unsalt_cipher_token
@@ -501,6 +501,9 @@ def api_dev_fetch_api_key(request, username=REQ()):
     if return_data.get("inactive_user"):
         return json_error(_("Your account has been disabled."),
                           data={"reason": "user disable"}, status=403)
+    if user_profile is None:
+        return json_error(_("This user is not registered."),
+                          data={"reason": "unregistered"}, status=403)
     login(request, user_profile)
     return json_success({"api_key": user_profile.api_key, "email": user_profile.email})
 
